@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Liste des irrigations</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+  body{background:#eaeaea;display:flex;justify-content:center;padding:0;}
+
+  .container{
+    width:100%;
+    max-width:100%;
+    background:white;
+    padding:12px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.1);
+    min-height:100vh;
+  }
+
+  /* Header */
+  .header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+
+  .header-title{
+    font-size:20px;
+    font-weight:bold;
+    color:#004a62;
+  }
+
+  .header-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  /* Export Button */
+  .export-box{ position:relative; }
+  .export-btn{
+    background:#0ea5e9;color:white;border:none;padding:10px 12px;border-radius:8px;
+    font-weight:bold;cursor:pointer;display:flex;align-items:center;gap:6px;
+  }
+  .export-menu{
+    position:absolute;top:44px;right:0;background:white;border:1px solid #d1d5db;border-radius:8px;
+    width:160px;display:none;flex-direction:column;box-shadow:0 4px 10px rgba(0,0,0,.1);z-index:50;
+  }
+  .export-menu button{
+    background:transparent;border:none;padding:10px;text-align:left;cursor:pointer;width:100%;
+  }
+  .export-menu button:hover{ background:#f0f0f0; }
+
+  /* Filter button */
+  .filter-btn{
+    background:#008ecc;color:#fff;border:none;padding:10px 12px;border-radius:8px;
+    cursor:pointer;font-weight:bold;display:flex;align-items:center;gap:8px;
+  }
+  .filter-btn:hover{ background:#0074ad; }
+
+  /* Table */
+  .table-container{
+    width:100%;
+    overflow:auto;
+    border-radius:8px;
+    border:2px solid #d1d5db;
+    height:calc(100vh - 85px);
+    background:#fff;
+  }
+
+  table{
+    width:1800px; /* كبير باش تمرير يمين/يسار */
+    border-collapse:collapse;
+    min-width:100%;
+  }
+
+  thead th{
+    background:#008ecc;color:white;padding:10px;position:sticky;top:0;z-index:2;
+    white-space:nowrap;
+  }
+
+  tbody td{
+    padding:10px;border-bottom:1px solid #e5e5e5;text-align:center;
+    white-space:nowrap; /* ✅ ماينقزش للسطر */
+  }
+
+  tbody tr:nth-child(even){ background:#f9f9f9; }
+  tbody tr:hover{ background:#eef8ff; }
+
+  .action-btn{
+    cursor:pointer;color:#0074ad;font-size:18px;
+  }
+
+  /* ====== FILTER MODAL (Excel-like) ====== */
+  .modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.45);
+    z-index:100;
+    align-items:center;
+    justify-content:center;
+    padding:14px;
+  }
+
+  .modal-card{
+    width:100%;
+    max-width:520px;
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.25);
+    overflow:hidden;
+  }
+
+  .modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 14px;
+    background:#f3f7fb;
+    border-bottom:1px solid #e5e7eb;
+  }
+
+  .modal-title{
+    font-weight:800;
+    color:#004a62;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .close-x{
+    width:34px;height:34px;border-radius:10px;border:none;
+    cursor:pointer;background:#fff;border:1px solid #e5e7eb;
+  }
+
+  .modal-body{ padding:14px; }
+
+  .block{
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:12px;
+  }
+
+  .block-title{
+    font-weight:800;
+    color:#0b4b66;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+
+  .row{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:10px;
+    margin-bottom:10px;
+  }
+
+  .row-1{ display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:10px; }
+
+  label{ font-size:12px; color:#475569; font-weight:700; }
+
+  input, select{
+    width:100%;
+    padding:10px 10px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    outline:none;
+    font-size:14px;
+    background:#fff;
+  }
+
+  input:focus, select:focus{ border-color:#008ecc; box-shadow:0 0 0 3px rgba(0,142,204,0.12); }
+
+  .modal-actions{
+    display:flex;
+    gap:10px;
+    padding:14px;
+    border-top:1px solid #e5e7eb;
+    background:#fff;
+  }
+
+  .btn{
+    flex:1;
+    border:none;
+    border-radius:12px;
+    padding:12px;
+    font-weight:900;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    font-size:14px;
+  }
+
+  .btn-apply{ background:#22c55e; color:#052e16; }
+  .btn-reset{ background:#f1f5f9; color:#0f172a; border:1px solid #e2e8f0; }
+  .btn-cancel{ background:#fee2e2; color:#7f1d1d; }
+
+  /* ====== Confirm delete modal ====== */
+  .confirm{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.45);
+    z-index:120;
+    align-items:center;
+    justify-content:center;
+    padding:14px;
+  }
+
+  .confirm-card{
+    width:100%;
+    max-width:420px;
+    background:#fff;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,0.25);
+  }
+
+  .confirm-head{
+    padding:14px;
+    background:#fff7ed;
+    border-bottom:1px solid #fed7aa;
+    font-weight:900;
+    color:#7c2d12;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .confirm-body{ padding:14px; color:#0f172a; }
+  .confirm-actions{ padding:14px; display:flex; gap:10px; border-top:1px solid #e5e7eb; }
+  .btn-del{ background:#ef4444; color:#fff; }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-title">Liste des irrigations</div>
+
+    <div class="header-actions">
+      <button class="filter-btn" onclick="openFilter()">
+        <i class="fas fa-filter"></i> Filtrer
+      </button>
+
+      <div class="export-box">
+        <button class="export-btn" onclick="toggleExport()">
+          <i class="fas fa-file-export"></i> Exporter
+        </button>
+        <div class="export-menu" id="exportMenu">
+          <button onclick="exportExcel()">📥 Export Excel (filtré)</button>
+          <button onclick="exportPDF()">📄 Export PDF (filtré)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-container">
+    <table id="irrigTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Ferme</th>
+          <th>Secteur</th>
+          <th>Serre</th>
+          <th>Point</th>
+          <th>Heure</th>
+          <th>Durée</th>
+          <th>Temps repos</th>
+          <th>V.Apport</th>
+          <th>EC Apport</th>
+          <th>PH Apport</th>
+          <th>V.Drainage</th>
+          <th>EC Drain</th>
+          <th>PH Drain</th>
+          <th>% Drainage</th>
+          <th>Moyenne drainage</th>
+          <th>Consom/bras</th>
+          <th>N° bras/point</th>
+          <th>N° goutteur/point</th>
+          <th>EC bassin</th>
+          <th>PH bassin</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ===== FILTER MODAL ===== -->
+<div class="modal" id="filterModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title"><i class="fas fa-filter"></i> Filtre (style Excel)</div>
+      <button class="close-x" onclick="closeFilter()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="modal-body">
+      <!-- SEARCH -->
+      <div class="block">
+        <div class="block-title"><i class="fas fa-magnifying-glass"></i> Recherche</div>
+        <div class="row-1">
+          <div>
+            <label>بحث (كيقلب فكل الأعمدة)</label>
+            <input id="f_search" type="text" placeholder="مثال: 2025-01-10 أو Ferme 1 أو P3...">
+          </div>
+        </div>
+      </div>
+
+      <!-- SORT -->
+      <div class="block">
+        <div class="block-title"><i class="fas fa-arrow-up-wide-short"></i> Tri / ترتيب</div>
+        <div class="row">
+          <div>
+            <label>العمود</label>
+            <select id="f_sort_col">
+              <option value="">— بدون —</option>
+              <option value="date">Date</option>
+              <option value="ferme">Ferme</option>
+              <option value="secteur">Secteur</option>
+              <option value="serre">Serre</option>
+              <option value="point">Point</option>
+              <option value="heure">Heure</option>
+              <option value="duree">Durée</option>
+              <option value="v_apport">V.Apport</option>
+              <option value="v_drain">V.Drainage</option>
+              <option value="drainagePercent">% Drainage</option>
+              <option value="bras_point">N° bras/point</option>
+              <option value="goutteur_point">N° goutteur/point</option>
+              <option value="ec_bassin">EC bassin</option>
+              <option value="ph_bassin">PH bassin</option>
+            </select>
+          </div>
+
+          <div>
+            <label>الاتجاه</label>
+            <select id="f_sort_dir">
+              <option value="asc">⬆️ A→Z / صغير→كبير / قديم→جديد</option>
+              <option value="desc">⬇️ Z→A / كبير→صغير / جديد→قديم</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATE RANGE -->
+      <div class="block">
+        <div class="block-title"><i class="fas fa-calendar-days"></i> تاريخ (من / إلى)</div>
+        <div class="row">
+          <div>
+            <label>من (أقدم)</label>
+            <input id="f_date_from" type="date">
+          </div>
+          <div>
+            <label>إلى (أحدث)</label>
+            <input id="f_date_to" type="date">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-reset" onclick="resetFilters()">
+        <i class="fas fa-rotate-left"></i> Reset
+      </button>
+      <button class="btn btn-cancel" onclick="closeFilter()">
+        <i class="fas fa-xmark"></i> Fermer
+      </button>
+      <button class="btn btn-apply" onclick="applyFilters()">
+        <i class="fas fa-check"></i> ✓ Appliquer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Confirm Delete ===== -->
+<div class="confirm" id="confirmDelete">
+  <div class="confirm-card">
+    <div class="confirm-head"><i class="fas fa-triangle-exclamation"></i> Confirmation</div>
+    <div class="confirm-body" id="confirmText">Supprimer ?</div>
+    <div class="confirm-actions">
+      <button class="btn btn-reset" onclick="closeDelete()">Annuler</button>
+      <button class="btn btn-del" onclick="doDelete()"><i class="fas fa-trash"></i> Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   DATA LOAD
+========================= */
+let irrigationsRaw = JSON.parse(localStorage.getItem("irrigations")) || [];
+// نخدمو على نسخة فيها index الأصلي
+let irrigations = irrigationsRaw.map((it, idx) => ({...it, __idx: idx}));
+
+let currentView = [...irrigations]; // هذا هو اللي كيبان فالتابل + كيتصدّر
+
+const tbody = document.getElementById("tbody");
+
+/* =========================
+   HELPERS (قراءة قيم بأسماء مختلفة)
+========================= */
+function getVal(o, keys, def="-"){
+  for(const k of keys){
+    if(o && o[k] !== undefined && o[k] !== null && o[k] !== "") return o[k];
+  }
+  return def;
+}
+
+function num(x){
+  const n = parseFloat(String(x).replace(",", "."));
+  return isNaN(n) ? null : n;
+}
+
+function computeDrainagePercent(item){
+  const a = num(getVal(item, ["v_apport","vApport"], ""));
+  const d = num(getVal(item, ["v_drain","vDrain"], ""));
+  if(a && a > 0 && d !== null) return ((d/a)*100);
+  return null;
+}
+
+function computeMoyenneDrain(item){
+  const ec = num(getVal(item, ["ec_drain","ecDrain"], ""));
+  const ph = num(getVal(item, ["ph_drain","phDrain"], ""));
+  if(ec !== null && ph !== null) return (ec + ph) / 2;
+  return null;
+}
+
+function computeConsomBras(item){
+  const a = num(getVal(item, ["v_apport","vApport"], ""));
+  const bras = num(getVal(item, ["bras_point","bras","brasPoint"], ""));
+  if(a !== null && bras && bras > 0) return (a/bras);
+  return null;
+}
+
+/* =========================
+   RENDER TABLE
+========================= */
+function renderTable(list){
+  tbody.innerHTML = "";
+
+  if(!list.length){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="22" style="padding:18px;color:#64748b;font-weight:bold;">Aucune donnée</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
+
+  list.forEach(item=>{
+    const dp = computeDrainagePercent(item);
+    const md = computeMoyenneDrain(item);
+    const cb = computeConsomBras(item);
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${getVal(item, ["date"], "-")}</td>
+      <td>${getVal(item, ["ferme"], "-")}</td>
+      <td>${getVal(item, ["secteur"], "-")}</td>
+      <td>${getVal(item, ["serre","parcelle"], "-")}</td>
+      <td>${getVal(item, ["point"], "-")}</td>
+
+      <td>${getVal(item, ["heure"], "-")}</td>
+      <td>${getVal(item, ["duree"], "-")}</td>
+      <td>${getVal(item, ["temps_repos","tempsRepos"], "-")}</td>
+
+      <td>${getVal(item, ["v_apport","vApport"], "-")}</td>
+      <td>${getVal(item, ["ec_apport","ecApport"], "-")}</td>
+      <td>${getVal(item, ["ph_apport","phApport"], "-")}</td>
+
+      <td>${getVal(item, ["v_drain","vDrain"], "-")}</td>
+      <td>${getVal(item, ["ec_drain","ecDrain"], "-")}</td>
+      <td>${getVal(item, ["ph_drain","phDrain"], "-")}</td>
+
+      <td>${dp===null ? "-" : dp.toFixed(1)+" %"}</td>
+      <td>${md===null ? "-" : md.toFixed(2)}</td>
+      <td>${cb===null ? "-" : cb.toFixed(1)}</td>
+
+      <td>${getVal(item, ["bras_point","bras","brasPoint"], "-")}</td>
+      <td>${getVal(item, ["goutteur_point","goutteur","goutteurPoint"], "-")}</td>
+      <td>${getVal(item, ["ec_bassin","ecBassin"], "-")}</td>
+      <td>${getVal(item, ["ph_bassin","phBassin"], "-")}</td>
+
+      <td>
+        <i class="fas fa-pen action-btn" title="Modifier" onclick="editRow(event, ${item.__idx})"></i>
+        &nbsp;&nbsp;
+        <i class="fas fa-trash action-btn" style="color:#ef4444" title="Supprimer" onclick="askDelete(event, ${item.__idx})"></i>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+/* =========================
+   EDIT / DELETE
+========================= */
+function editRow(ev, originalIndex){
+  ev.stopPropagation();
+  localStorage.setItem("editIndex", originalIndex);
+  location.href = "ajouter_irrigation.html";
+}
+
+let deleteIndex = null;
+function askDelete(ev, originalIndex){
+  ev.stopPropagation();
+  deleteIndex = originalIndex;
+  document.getElementById("confirmText").innerText = "Voulez-vous vraiment supprimer cette ligne ?";
+  document.getElementById("confirmDelete").style.display = "flex";
+}
+function closeDelete(){
+  document.getElementById("confirmDelete").style.display = "none";
+  deleteIndex = null;
+}
+function doDelete(){
+  if(deleteIndex === null) return;
+
+  // نحيد من raw حسب index
+  irrigationsRaw.splice(deleteIndex, 1);
+  localStorage.setItem("irrigations", JSON.stringify(irrigationsRaw));
+
+  // نعاود نبني البيانات
+  irrigations = irrigationsRaw.map((it, idx) => ({...it, __idx: idx}));
+  currentView = [...irrigations];
+
+  closeDelete();
+  // إعادة تطبيق الفلاتر الحالية (أحسن)
+  applyFilters(true);
+}
+
+/* =========================
+   EXPORT MENU
+========================= */
+function toggleExport(){
+  const menu = document.getElementById("exportMenu");
+  menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+}
+
+/* =========================
+   FILTER MODAL
+========================= */
+function openFilter(){
+  document.getElementById("filterModal").style.display = "flex";
+}
+function closeFilter(){
+  document.getElementById("filterModal").style.display = "none";
+}
+
+/* Reset filters */
+function resetFilters(){
+  document.getElementById("f_search").value = "";
+  document.getElementById("f_sort_col").value = "";
+  document.getElementById("f_sort_dir").value = "asc";
+  document.getElementById("f_date_from").value = "";
+  document.getElementById("f_date_to").value = "";
+
+  currentView = [...irrigations];
+  renderTable(currentView);
+}
+
+/* Apply filters (with optional keepModalOpen for delete refresh) */
+function applyFilters(keepModalOpen=false){
+  const q = document.getElementById("f_search").value.trim().toLowerCase();
+  const sortCol = document.getElementById("f_sort_col").value;
+  const sortDir = document.getElementById("f_sort_dir").value; // asc/desc
+  const df = document.getElementById("f_date_from").value;
+  const dt = document.getElementById("f_date_to").value;
+
+  // 1) base list
+  let list = [...irrigations];
+
+  // 2) date range filter (on item.date if exists)
+  if(df){
+    list = list.filter(it => {
+      const d = getVal(it, ["date"], "");
+      return d && d >= df;
+    });
+  }
+  if(dt){
+    list = list.filter(it => {
+      const d = getVal(it, ["date"], "");
+      return d && d <= dt;
+    });
+  }
+
+  // 3) search filter (full row)
+  if(q){
+    list = list.filter(it => {
+      // نكوّن string من القيم اللي مهمة
+      const dp = computeDrainagePercent(it);
+      const md = computeMoyenneDrain(it);
+      const cb = computeConsomBras(it);
+
+      const rowStr = [
+        getVal(it, ["date"], ""),
+        getVal(it, ["ferme"], ""),
+        getVal(it, ["secteur"], ""),
+        getVal(it, ["serre","parcelle"], ""),
+        getVal(it, ["point"], ""),
+        getVal(it, ["heure"], ""),
+        getVal(it, ["duree"], ""),
+        getVal(it, ["temps_repos","tempsRepos"], ""),
+        getVal(it, ["v_apport","vApport"], ""),
+        getVal(it, ["ec_apport","ecApport"], ""),
+        getVal(it, ["ph_apport","phApport"], ""),
+        getVal(it, ["v_drain","vDrain"], ""),
+        getVal(it, ["ec_drain","ecDrain"], ""),
+        getVal(it, ["ph_drain","phDrain"], ""),
+        dp===null ? "" : dp.toFixed(1),
+        md===null ? "" : md.toFixed(2),
+        cb===null ? "" : cb.toFixed(1),
+        getVal(it, ["bras_point","bras","brasPoint"], ""),
+        getVal(it, ["goutteur_point","goutteur","goutteurPoint"], ""),
+        getVal(it, ["ec_bassin","ecBassin"], ""),
+        getVal(it, ["ph_bassin","phBassin"], "")
+      ].join(" ").toLowerCase();
+
+      return rowStr.includes(q);
+    });
+  }
+
+  // 4) sorting
+  if(sortCol){
+    list.sort((a,b)=>{
+      // special computed columns
+      let va, vb;
+
+      if(sortCol === "drainagePercent"){
+        va = computeDrainagePercent(a); vb = computeDrainagePercent(b);
+      } else {
+        va = getVal(a, [sortCol], "");
+        vb = getVal(b, [sortCol], "");
+      }
+
+      // if date column
+      if(sortCol === "date"){
+        va = getVal(a, ["date"], "");
+        vb = getVal(b, ["date"], "");
+        // مقارنة strings ISO YYYY-MM-DD كافية
+        if(va < vb) return sortDir==="asc" ? -1 : 1;
+        if(va > vb) return sortDir==="asc" ? 1 : -1;
+        return 0;
+      }
+
+      // numeric?
+      const na = num(va), nb = num(vb);
+      if(na !== null && nb !== null){
+        return sortDir==="asc" ? (na-nb) : (nb-na);
+      }
+
+      // string fallback
+      va = String(va).toLowerCase();
+      vb = String(vb).toLowerCase();
+      if(va < vb) return sortDir==="asc" ? -1 : 1;
+      if(va > vb) return sortDir==="asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
+  currentView = list;
+  renderTable(currentView);
+
+  if(!keepModalOpen) closeFilter();
+}
+
+/* =========================
+   EXPORT (respect filter)
+========================= */
+function exportExcel(){
+  // نصاوب نفس الأعمدة اللي فالتابل
+  const rows = currentView.map(it=>{
+    const dp = computeDrainagePercent(it);
+    const md = computeMoyenneDrain(it);
+    const cb = computeConsomBras(it);
+
+    return {
+      Date: getVal(it, ["date"], ""),
+      Ferme: getVal(it, ["ferme"], ""),
+      Secteur: getVal(it, ["secteur"], ""),
+      Serre: getVal(it, ["serre","parcelle"], ""),
+      Point: getVal(it, ["point"], ""),
+      Heure: getVal(it, ["heure"], ""),
+      "Durée": getVal(it, ["duree"], ""),
+      "Temps repos": getVal(it, ["temps_repos","tempsRepos"], ""),
+      "V.Apport": getVal(it, ["v_apport","vApport"], ""),
+      "EC Apport": getVal(it, ["ec_apport","ecApport"], ""),
+      "PH Apport": getVal(it, ["ph_apport","phApport"], ""),
+      "V.Drainage": getVal(it, ["v_drain","vDrain"], ""),
+      "EC Drain": getVal(it, ["ec_drain","ecDrain"], ""),
+      "PH Drain": getVal(it, ["ph_drain","phDrain"], ""),
+      "% Drainage": dp===null ? "" : dp.toFixed(1),
+      "Moyenne drainage": md===null ? "" : md.toFixed(2),
+      "Consom/bras": cb===null ? "" : cb.toFixed(1),
+      "N° bras/point": getVal(it, ["bras_point","bras","brasPoint"], ""),
+      "N° goutteur/point": getVal(it, ["goutteur_point","goutteur","goutteurPoint"], ""),
+      "EC bassin": getVal(it, ["ec_bassin","ecBassin"], ""),
+      "PH bassin": getVal(it, ["ph_bassin","phBassin"], "")
+    };
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(rows);
+  XLSX.utils.book_append_sheet(wb, ws, "Irrigations filtrées");
+  XLSX.writeFile(wb, "irrigations_filtrees.xlsx");
+}
+
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("l","pt");
+  doc.setFontSize(18);
+  doc.setTextColor(0,142,204);
+  doc.text("Liste des irrigations", 40, 40);
+
+  doc.setFontSize(10);
+  doc.setTextColor(0);
+
+  let y = 75;
+
+  currentView.forEach(it=>{
+    const line = [
+      getVal(it, ["date"], "-"),
+      getVal(it, ["ferme"], "-"),
+      getVal(it, ["secteur"], "-"),
+      getVal(it, ["serre","parcelle"], "-"),
+      getVal(it, ["point"], "-"),
+      "Apport:"+getVal(it, ["v_apport","vApport"], "-"),
+      "Drain:"+getVal(it, ["v_drain","vDrain"], "-")
+    ].join(" | ");
+
+    doc.text(line, 40, y);
+    y += 16;
+    if(y > 560){
+      doc.addPage();
+      y = 60;
+    }
+  });
+
+  doc.save("irrigations_filtrees.pdf");
+}
+
+/* =========================
+   INIT
+========================= */
+renderTable(currentView);
+
+// إغلاق القوائم بالنقر خارجها
+document.addEventListener("click", (e)=>{
+  const exportMenu = document.getElementById("exportMenu");
+  const exportBox = document.querySelector(".export-box");
+  if(exportMenu.style.display==="flex" && exportBox && !exportBox.contains(e.target)){
+    exportMenu.style.display="none";
+  }
+});
+</script>
+
+</body>
+</html>

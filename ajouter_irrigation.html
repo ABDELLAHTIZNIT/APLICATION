@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ajouter irrigation</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family: Arial, sans-serif;
+}
+
+body{
+  margin:0;
+  background:#f2f4f7;
+}
+
+/* ====== CONTAINER FULL SCREEN ====== */
+.container{
+  width:100vw;
+  min-height:100vh;
+  background:#fff;
+  padding:16px;
+}
+
+/* ====== HEADER ====== */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-weight:bold;
+  color:#2c9dd8;
+}
+
+.user{
+  color:#777;
+  font-size:14px;
+}
+
+h2{
+  text-align:center;
+  color:#2c9dd8;
+  margin:14px 0 24px;
+}
+
+/* ====== INPUTS ====== */
+label{
+  font-size:13px;
+  color:#555;
+}
+
+input{
+  width:100%;
+  padding:11px;
+  margin-top:6px;
+  margin-bottom:14px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  font-size:14px;
+  background:#fafafa;
+}
+
+/* ====== GRIDS ====== */
+.row-3{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+}
+
+.row-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+/* ====== BUTTON ====== */
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:#2c9dd8;
+  color:#fff;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:20px;
+}
+
+button:hover{
+  background:#238ac0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="logo">AGRI APP</div>
+    <div class="user">Admin</div>
+  </div>
+
+  <h2>Ajouter irrigation</h2>
+
+  <!-- DATE -->
+  <label>Date</label>
+  <input type="date" id="date">
+
+  <!-- TOURS / HEURE / DUREE -->
+  <div class="row-3">
+    <div>
+      <label>N° Tours</label>
+      <input type="number" id="tours">
+    </div>
+    <div>
+      <label>Heure</label>
+      <input type="time" id="heure">
+    </div>
+    <div>
+      <label>Durée (min)</label>
+      <input type="number" id="duree">
+    </div>
+  </div>
+
+  <!-- APPORT -->
+  <div class="row-3">
+    <div>
+      <label>V. Apport (ml)</label>
+      <input type="number" id="vApport">
+    </div>
+    <div>
+      <label>EC Apport</label>
+      <input type="number" step="0.01" id="ecApport">
+    </div>
+    <div>
+      <label>PH Apport</label>
+      <input type="number" step="0.01" id="phApport">
+    </div>
+  </div>
+
+  <!-- DRAINAGE -->
+  <div class="row-3">
+    <div>
+      <label>V. Drainage (ml)</label>
+      <input type="number" id="vDrain">
+    </div>
+    <div>
+      <label>EC Drainage</label>
+      <input type="number" step="0.01" id="ecDrain">
+    </div>
+    <div>
+      <label>PH Drainage</label>
+      <input type="number" step="0.01" id="phDrain">
+    </div>
+  </div>
+
+  <!-- BRAS / GOUTTEUR -->
+  <div class="row-2">
+    <div>
+      <label>N° bras / point</label>
+      <input type="number" id="bras">
+    </div>
+    <div>
+      <label>N° goutteur / point</label>
+      <input type="number" id="goutteur">
+    </div>
+  </div>
+
+  <!-- BASSIN -->
+  <div class="row-2">
+    <div>
+      <label>EC bassin</label>
+      <input type="number" step="0.01" id="ecBassin">
+    </div>
+    <div>
+      <label>PH bassin</label>
+      <input type="number" step="0.01" id="phBassin">
+    </div>
+  </div>
+
+  <button onclick="saveIrrigation()">Validé</button>
+
+</div>
+
+<script>
+/* Date اليوم تلقائياً */
+document.getElementById("date").value =
+  new Date().toISOString().split("T")[0];
+
+function saveIrrigation(){
+  const irrigation = {
+    date: date.value,
+    tours: tours.value,
+    heure: heure.value,
+    duree: duree.value,
+    vApport: vApport.value,
+    ecApport: ecApport.value,
+    phApport: phApport.value,
+    vDrain: vDrain.value,
+    ecDrain: ecDrain.value,
+    phDrain: phDrain.value,
+    bras: bras.value,
+    goutteur: goutteur.value,
+    ecBassin: ecBassin.value,
+    phBassin: phBassin.value
+  };
+
+  let list = JSON.parse(localStorage.getItem("irrigations")) || [];
+  list.push(irrigation);
+  localStorage.setItem("irrigations", JSON.stringify(list));
+
+  alert("Irrigation enregistrée ✔");
+}
+</script>
+
+</body>
+</html>

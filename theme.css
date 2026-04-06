@@ -1,0 +1,265 @@
+/* ===============================
+   THEME GLOBAL - AGRI APP
+================================ */
+
+:root{
+  --bg-page:#f3f4f6;
+  --bg-card:#ffffff;
+  --primary:#008ecc;
+  --primary-dark:#0074ad;
+  --success:#22c55e;
+  --danger:#ef4444;
+  --text-main:#004a62;
+  --border:#d1d5db;
+  --row-alt:#f9fafb;
+}
+
+/* RESET */
+*{
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
+
+/* PAGE */
+body{
+  margin:0;
+  background:var(--bg-page);
+  padding:20px;
+}
+
+/* CONTAINER */
+.container{
+  max-width:900px;
+  margin:auto;
+  background:var(--bg-card);
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 6px 20px rgba(0,0,0,.1);
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+}
+
+.header h2,
+.title{
+  margin:0;
+  color:var(--text-main);
+}
+
+/* BUTTONS */
+.btn,
+.add-btn{
+  background:var(--success);
+  color:#fff;
+  border:none;
+  padding:8px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:16px;
+}
+
+.btn-primary{
+  background:var(--primary);
+}
+.btn-primary:hover{
+  background:var(--primary-dark);
+}
+
+.btn-danger{
+  background:var(--danger);
+}
+
+/* TABLE */
+.table-wrapper{
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--border);
+}
+
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+}
+
+thead th{
+  background:var(--primary);
+  color:#fff;
+  padding:12px;
+  text-align:center;
+}
+
+tbody td{
+  padding:10px;
+  text-align:center;
+  border-top:1px solid var(--border);
+}
+
+tbody tr:nth-child(even){
+  background:var(--row-alt);
+}
+
+/* ACTION ICONS */
+.action-btn{
+  cursor:pointer;
+  font-size:16px;
+}
+.action-delete{
+  color:var(--danger);
+}
+.action-edit{
+  color:var(--primary-dark);
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+.modal-content{
+  background:#fff;
+  width:95%;
+  max-width:420px;
+  border-radius:12px;
+  padding:16px;
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.modal-header i{
+  cursor:pointer;
+}
+
+input,select{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:8px;
+  border:1px solid var(--border);
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+/* ===============================
+   LOGO – موحد فـ جميع الواجهات
+   =============================== */
+
+.app-logo{
+  display: block;
+  max-width: 180px;      /* حجم مناسب للموبايل */
+  width: 100%;
+  height: auto;
+  margin: 0 auto 12px;   /* وسط + مسافة لتحت */
+}
+
+/* عنوان الصفحة تحت الشعار */
+.page-title{
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 14px;
+}
+/* ===== GRID DES ICONES (3 par ligne) ===== */
+.icon-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+
+/* ===== CARTE ICONE ===== */
+.icon-card{
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px 10px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.25s ease;
+}
+
+.icon-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
+/* ===== ICON ===== */
+.icon-card i{
+  font-size: 26px;
+  color: #008ecc;
+  margin-bottom: 8px;
+}
+
+/* ===== TEXTE ===== */
+.icon-card span{
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #004458;
+}
+
+/* 📱 Responsive (الهاتف الصغير) */
+@media(max-width:500px){
+  .icon-grid{
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+/* ===== LIGNES A 3 ICONES / BLOCS ===== */
+.triple-row{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 10px 0;
+}
+
+/* ===== BLOC ICONE / INPUT ===== */
+.triple-item{
+  background: #f8fafc;
+  border: 1.5px solid #dbeafe;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+}
+
+/* icone */
+.triple-item i{
+  font-size: 20px;
+  color: #008ecc;
+  margin-bottom: 6px;
+}
+
+/* input */
+.triple-item input{
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+/* 📱 هاتف */
+@media(max-width:520px){
+  .triple-row{
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suivi d'Irrigation</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+
+  body{
+    min-height:100vh;
+    background:#f4f4f4;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:20px;
+  }
+
+  .container{
+    width:100%;
+    max-width:500px;
+    background:white;
+    padding:18px;
+    border-radius:12px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  /* Header */
+  .header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+  }
+
+  .logo-app{
+  width:90px;
+  background:transparent;
+}
+
+.logo-app img{
+  width:100%;
+  height:auto;
+  object-fit:contain;
+}
+
+
+  .user-info{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:15px;
+    font-weight:bold;
+  }
+
+  .user-avatar{
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:#22c55e;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+
+  .title{
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+    color:#004a62;
+    margin-bottom:20px;
+  }
+
+  .dropdown{
+    background:#ffffffc9;
+    border:2px solid #59c4e6;
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .dropdown i{color:#007ea7;font-size:18px;}
+
+  select{
+    width:100%;
+    border:none;
+    background:transparent;
+    font-size:15px;
+    font-weight:bold;
+    outline:none;
+    cursor:pointer;
+    color:#004458;
+  }
+
+  /* Buttons */
+  .btns-row{
+    display:flex;
+    gap:12px;
+    margin-top:20px;
+  }
+
+  .btn{
+    flex:1;
+    background:#008ecc;
+    color:white;
+    border:none;
+    padding:14px 10px;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.2s;
+  }
+
+  .btn:hover{background:#0074ad;}
+
+  .history-btn{
+    flex:1;
+    background:#0ea5e9;
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-app">
+  <img id="appLogo" src="" alt="Logo">
+</div>
+
+    <div class="user-info">
+      <span>Admin</span>
+      <div class="user-avatar">A</div>
+    </div>
+  </div>
+
+  <div class="title">Suivi d'Irrigation</div>
+
+  <!-- Dropdowns -->
+  <div class="dropdown">
+    <i class="fas fa-warehouse"></i>
+    <select id="ferme">
+      <option disabled selected>Ferme</option>
+      <option>Karam Green</option>
+      <option>AgriPro</option>
+    </select>
+  </div>
+
+  <div class="dropdown">
+    <i class="fas fa-vector-square"></i>
+    <select id="secteur">
+      <option disabled selected>Secteur</option>
+      <option>S1</option>
+      <option>S2</option>
+    </select>
+  </div>
+
+  <div class="dropdown">
+    <i class="fas fa-industry"></i>
+    <select id="serre">
+      <option disabled selected>Serre</option>
+      <option>Serre 1</option>
+      <option>Serre 2</option>
+    </select>
+  </div>
+
+  <div class="dropdown">
+    <i class="fas fa-map-pin"></i>
+    <select id="point">
+      <option disabled selected>Point</option>
+      <option>P1</option>
+      <option>P2</option>
+    </select>
+  </div>
+
+  <!-- New Two Buttons -->
+  <div class="btns-row">
+    <button class="btn" onclick="openAdd()">
+      <i class="fas fa-plus"></i> Ajouter irrigation
+    </button>
+
+    <button class="btn history-btn" onclick="openHistory()">
+      <i class="fas fa-list"></i> Irrigations enregistrées
+    </button>
+  </div>
+
+</div>
+
+<script>
+function saveSelection(){
+  const data = {
+    ferme: document.getElementById("ferme").value,
+    secteur: document.getElementById("secteur").value,
+    serre: document.getElementById("serre").value,
+    point: document.getElementById("point").value
+  };
+
+  localStorage.setItem("irrigation_selection", JSON.stringify(data));
+}
+
+function openAdd(){
+  saveSelection();
+  location.href = "ajouter_irrigation.html";
+}
+
+function openHistory(){
+  location.href = "irrigation_enregistrees.html";
+}
+
+// تحميل الشعار المحفوظ
+window.addEventListener("load", function(){
+  const savedLogo = localStorage.getItem("app_logo");
+  if(savedLogo){
+    const logo = document.getElementById("appLogo");
+    if(logo) logo.src = savedLogo;
+  }
+});
+</script>
+
+
+</body>
+</html>

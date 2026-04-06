@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vannes</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
+
+body{
+  margin:0;
+  background:#f3f4f6;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:20px;
+}
+
+.container{
+  width:100%;
+  max-width:900px;
+  background:#ffffff;
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.header h2{
+  color:#065f46;
+}
+
+.add-btn{
+  background:#22c55e;
+  border:none;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #e5e7eb;
+  text-align:center;
+}
+
+th{
+  background:#ecfdf5;
+  color:#065f46;
+}
+
+.delete{
+  color:#ef4444;
+  cursor:pointer;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-content{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  width:100%;
+  max-width:420px;
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.modal-header i{
+  cursor:pointer;
+}
+
+input,select{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #d1d5db;
+}
+
+.actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+
+.save{
+  background:#22c55e;
+  border:none;
+  padding:8px 14px;
+  font-size:18px;
+}
+.cancel{
+  background:#ef4444;
+  border:none;
+  padding:8px 14px;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h2>Vannes</h2>
+    <button class="add-btn" onclick="openModal()">+</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nom Vanne</th>
+        <th>Parcelle physique</th>
+        <th>Parcelle</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Ajouter une vanne</h3>
+      <i class="fas fa-times" onclick="closeModal()"></i>
+    </div>
+
+    <input id="nom" placeholder="Nom vanne (ex: V1)">
+
+    <select id="parcelle_physique">
+      <option value="">-- Parcelle physique --</option>
+    </select>
+
+    <select id="parcelle">
+      <option value="">-- Parcelle --</option>
+    </select>
+
+    <div class="actions">
+      <button class="save" onclick="save()">✓</button>
+      <button class="cancel" onclick="closeModal()">×</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let vannes = JSON.parse(localStorage.getItem("vannes")) || [];
+let parcelles = JSON.parse(localStorage.getItem("parcelles")) || [];
+let physiques = JSON.parse(localStorage.getItem("parcelles_physiques")) || [];
+
+function openModal(){
+  modal.style.display="flex";
+
+  parcelle_physique.innerHTML='<option value="">-- Parcelle physique --</option>';
+  physiques.forEach(p=>{
+    parcelle_physique.innerHTML += `<option>${p.nom}</option>`;
+  });
+
+  parcelle.innerHTML='<option value="">-- Parcelle --</option>';
+  parcelles.forEach(p=>{
+    parcelle.innerHTML += `<option>${p.nom}</option>`;
+  });
+}
+
+function closeModal(){
+  modal.style.display="none";
+}
+
+function save(){
+  vannes.push({
+    nom: nom.value,
+    parcelle_physique: parcelle_physique.value,
+    parcelle: parcelle.value
+  });
+
+  localStorage.setItem("vannes", JSON.stringify(vannes));
+  closeModal();
+  render();
+}
+
+function render(){
+  tableBody.innerHTML="";
+  vannes.forEach((v,i)=>{
+    tableBody.innerHTML += `
+      <tr>
+        <td>${v.nom}</td>
+        <td>${v.parcelle_physique}</td>
+        <td>${v.parcelle}</td>
+        <td><i class="fas fa-trash delete" onclick="remove(${i})"></i></td>
+      </tr>`;
+  });
+}
+
+function remove(i){
+  vannes.splice(i,1);
+  localStorage.setItem("vannes", JSON.stringify(vannes));
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>

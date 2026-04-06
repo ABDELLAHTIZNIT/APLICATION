@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{box-sizing:border-box;}
+
+body{
+    margin:0;
+    background:#111827;
+    font-family:Arial, sans-serif;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#fff;
+}
+
+/* زر اللغة */
+.lang{
+    position:fixed;
+    top:10px;
+    right:10px;
+    background:#1e293b;
+    padding:6px 9px;
+    border-radius:6px;
+    font-size:13px;
+    cursor:pointer;
+    z-index:10;
+}
+
+.container{
+    width:100%;
+    max-width:320px;
+    text-align:center;
+}
+
+/* LOGO بدون خلفية */
+.logo-app{
+    width:120px;
+    margin:0 auto 28px;
+}
+
+.logo-app img{
+    width:100%;
+    height:auto;
+    object-fit:contain;
+}
+
+/* Inputs */
+.input-group{
+    position:relative;
+    margin:15px 0;
+}
+
+input{
+    width:100%;
+    padding:13px 44px;
+    border:none;
+    border-radius:10px;
+    background:#1f2937;
+    color:#fff;
+    font-size:15px;
+}
+
+input::placeholder{color:#9ca3af;}
+input:focus{outline:2px solid #22c55e;}
+
+.input-icon{
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#9ca3af;
+    font-size:17px;
+}
+
+.toggle-pass{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#9ca3af;
+    font-size:17px;
+    cursor:pointer;
+}
+
+/* remember */
+.remember{
+    display:flex;
+    justify-content:center;
+    margin:15px 0 22px;
+}
+
+/* Button */
+button{
+    width:70%;
+    margin:0 auto;
+    display:block;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#22c55e;
+    font-weight:bold;
+    font-size:16px;
+    color:#000;
+    cursor:pointer;
+}
+
+button:hover{background:#16a34a;}
+
+.msg{
+    font-size:13px;
+    margin-top:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="lang" id="langBtn" onclick="switchLang()">FR</div>
+
+<div class="container">
+
+    <!-- LOGO GLOBAL -->
+    <div class="logo-app">
+        <img id="appLogo" src="" alt="Logo">
+    </div>
+
+    <form onsubmit="return login(event)">
+        <div class="input-group">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" id="username" placeholder="Username" required>
+        </div>
+
+        <div class="input-group">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="password" placeholder="Password" required>
+            <i id="eyeIcon" class="fas fa-eye toggle-pass" onclick="togglePassword()"></i>
+        </div>
+
+        <div class="remember">
+            <input type="checkbox" id="remember">
+        </div>
+
+        <button type="submit">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+
+        <div class="msg" id="msg"></div>
+    </form>
+</div>
+
+<script>
+/* LOGIN */
+function login(e){
+    e.preventDefault();
+    const u = username.value;
+    const p = password.value;
+
+    if(u === "admin" && p === "123456"){
+        msg.style.color = "lightgreen";
+        msg.innerText = "Login successful!";
+        setTimeout(()=>{location.href="dashboard.html"},700);
+    }else{
+        msg.style.color = "#ef4444";
+        msg.innerText = "Incorrect username or password";
+    }
+}
+
+/* SHOW PASSWORD */
+function togglePassword(){
+    if(password.type === "password"){
+        password.type = "text";
+        eyeIcon.classList.replace("fa-eye","fa-eye-slash");
+    }else{
+        password.type = "password";
+        eyeIcon.classList.replace("fa-eye-slash","fa-eye");
+    }
+}
+
+/* LANG */
+let currentLang="FR";
+function switchLang(){
+    currentLang = currentLang==="FR"?"EN":"FR";
+    langBtn.innerText=currentLang;
+
+    if(currentLang==="EN"){
+        username.placeholder="Username";
+        password.placeholder="Password";
+        document.querySelector("button").innerHTML='<i class="fas fa-sign-in-alt"></i> Login';
+    }else{
+        username.placeholder="Nom d\'utilisateur";
+        password.placeholder="Mot de passe";
+        document.querySelector("button").innerHTML='<i class="fas fa-sign-in-alt"></i> Connexion';
+    }
+}
+
+/* LOAD GLOBAL LOGO */
+window.addEventListener("load",()=>{
+    const logo = localStorage.getItem("app_logo");
+    if(logo){
+        document.getElementById("appLogo").src = logo;
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<div class="section">
+    <div class="section-header" onclick="toggle(this)">
+        <span><i class="fas fa-shield-alt"></i> Sécurité / Accès</span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+
+    <div class="section-content">
+
+        <div class="small-title">Sélectionner utilisateur</div>
+        <select id="userSelect">
+            <option>Ahmed</option>
+            <option>Mohamed</option>
+            <option>User Test</option>
+        </select>
+
+        <div class="small-title">Profil</div>
+        <select id="roleSelect">
+            <option>Administrateur</option>
+            <option>Contrôle</option>
+            <option>Lecture seulement</option>
+            <option>Accès limité</option>
+        </select>
+
+        <div class="small-title">Permissions</div>
+
+        <label class="perm-row">
+            <input type="checkbox"> Accès aux paramètres
+        </label>
+
+        <label class="perm-row">
+            <input type="checkbox"> Ajouter irrigation
+        </label>
+
+        <label class="perm-row">
+            <input type="checkbox"> Modifier irrigation
+        </label>
+
+        <label class="perm-row">
+            <input type="checkbox"> Supprimer irrigation
+        </label>
+
+        <label class="perm-row">
+            <input type="checkbox"> Accès Suivi Eau
+        </label>
+
+        <label class="perm-row">
+            <input type="checkbox"> Accès Balance
+        </label>
+
+        <label class="perm-row">
+            <input type="checkbox"> Accès Paramètres structures
+        </label>
+
+        <button class="btn">Enregistrer</button>
+    </div>
+</div>
+
+<style>
+.perm-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:8px;
+    font-size:15px;
+}
+</style>

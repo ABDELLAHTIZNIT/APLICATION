@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>اسم الصفحة</title>
+
+  <!-- CSS الموحد -->
+  <link rel="stylesheet" href="theme.css">
+
+  <!-- أيقونات -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="title">Ajouter utilisateur</div>
+
+  <!-- Username -->
+  <div class="input-group">
+    <input type="text" id="username" placeholder="Nom d'utilisateur">
+  </div>
+
+  <!-- Password -->
+  <div class="input-group">
+    <input type="password" id="password" placeholder="Mot de passe">
+    <i class="fas fa-eye icon-eye" onclick="togglePass(this)"></i>
+  </div>
+
+  <!-- Ferme -->
+  <div class="input-group">
+    <select id="ferme">
+      <option disabled selected>Choisir la Ferme</option>
+      <option>Ferme 1</option>
+      <option>Ferme 2</option>
+      <option>Karam Green</option>
+    </select>
+  </div>
+
+  <!-- Profil -->
+  <div class="input-group">
+    <select id="profil">
+      <option disabled selected>Choisir Profil</option>
+      <option>Administrateur</option>
+      <option>Control</option>
+      <option>Utilisateur</option>
+    </select>
+  </div>
+
+  <!-- Buttons -->
+  <button class="btn" onclick="saveUser()">Valider</button>
+  <button class="btn cancel" onclick="cancel()">Annuler</button>
+
+</div>
+
+<script>
+function togglePass(icon){
+  let input = document.getElementById("password");
+  if(input.type === "password"){
+    input.type = "text";
+    icon.classList.replace("fa-eye", "fa-eye-slash");
+  } else {
+    input.type = "password";
+    icon.classList.replace("fa-eye-slash", "fa-eye");
+  }
+}
+
+function saveUser(){
+  alert("Utilisateur ajouté (fonction à développer)");
+}
+
+function cancel(){
+  window.history.back();
+}
+</script>
+
+</body>
+</html>

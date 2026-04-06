@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stations</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{box-sizing:border-box;font-family:Arial, sans-serif;}
+
+body{
+    margin:0;
+    background:#f3f4f6;
+    display:flex;
+    justify-content:center;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:700px;
+    background:#fff;
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.1);
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+}
+
+.header h2{
+    margin:0;
+    color:#004a62;
+}
+
+.add-btn{
+    background:#22c55e;
+    border:none;
+    color:#fff;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:18px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th, td{
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#008ecc;
+    color:#fff;
+}
+
+tr:nth-child(even){
+    background:#f9fafb;
+}
+
+.action-btn{
+    cursor:pointer;
+    font-size:16px;
+    margin:0 6px;
+}
+
+.action-btn.delete{color:#ef4444;}
+.action-btn.edit{color:#0ea5e9;}
+
+/* MODAL */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.4);
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-content{
+    background:#fff;
+    width:90%;
+    max-width:400px;
+    border-radius:12px;
+    padding:16px;
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
+
+.modal-header h3{
+    margin:0;
+}
+
+.modal-header i{
+    cursor:pointer;
+}
+
+input, select{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:8px;
+    border:1px solid #d1d5db;
+}
+
+.modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:10px;
+}
+
+.btn-save{
+    background:#22c55e;
+    color:#fff;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.btn-cancel{
+    background:#ef4444;
+    color:#fff;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h2>Stations</h2>
+        <button class="add-btn" onclick="openModal()">+</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nom Station</th>
+                <th>Ferme</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="stationTable"></tbody>
+    </table>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Ajouter une station</h3>
+            <i class="fas fa-times" onclick="closeModal()"></i>
+        </div>
+
+        <input type="text" id="stationName" placeholder="Nom de la station">
+
+        <select id="stationFerme">
+            <option value="">-- Choisir une ferme --</option>
+        </select>
+
+        <div class="modal-actions">
+            <button class="btn-save" onclick="saveStation()">✓</button>
+            <button class="btn-cancel" onclick="closeModal()">✕</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let stations = JSON.parse(localStorage.getItem("stations")) || [];
+let fermes = JSON.parse(localStorage.getItem("fermes")) || [];
+
+/* تحميل fermes في select */
+function loadFermes(){
+    const select = document.getElementById("stationFerme");
+    select.innerHTML = '<option value="">-- Choisir une ferme --</option>';
+
+    fermes.forEach(f => {
+        const opt = document.createElement("option");
+        opt.value = f.nom;
+        opt.textContent = f.nom;
+        select.appendChild(opt);
+    });
+}
+
+/* عرض الجدول */
+function renderStations(){
+    const tbody = document.getElementById("stationTable");
+    tbody.innerHTML = "";
+
+    stations.forEach((s, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${s.nom}</td>
+            <td>${s.ferme}</td>
+            <td>
+                <i class="fas fa-trash action-btn delete" onclick="deleteStation(${i})"></i>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function openModal(){
+    loadFermes();
+    document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal(){
+    document.getElementById("modal").style.display = "none";
+    document.getElementById("stationName").value = "";
+    document.getElementById("stationFerme").value = "";
+}
+
+function saveStation(){
+    const nom = stationName.value.trim();
+    const ferme = stationFerme.value;
+
+    if(!nom || !ferme){
+        alert("Remplir tous les champs");
+        return;
+    }
+
+    stations.push({ nom, ferme });
+    localStorage.setItem("stations", JSON.stringify(stations));
+
+    closeModal();
+    renderStations();
+}
+
+function deleteStation(index){
+    if(confirm("Supprimer cette station ?")){
+        stations.splice(index,1);
+        localStorage.setItem("stations", JSON.stringify(stations));
+        renderStations();
+    }
+}
+
+renderStations();
+</script>
+
+</body>
+</html>

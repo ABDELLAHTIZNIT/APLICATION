@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balance</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+
+  body{
+    background:#f4f4f4;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:20px;
+    min-height:100vh;
+  }
+
+  .container{
+    width:100%;
+    max-width:520px;
+    background:white;
+    border-radius:12px;
+    padding:18px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  /* Header */
+  .header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+  }
+
+  .logo-app{
+  width:90px;
+  background:transparent;
+}
+
+.logo-app img{
+  width:100%;
+  height:auto;
+  object-fit:contain;
+}
+
+
+  .user-info{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:15px;
+    font-weight:bold;
+  }
+  .user-avatar{
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:#22c55e;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+
+  .row{
+    display:flex;
+    gap:10px;
+    margin-bottom:12px;
+  }
+
+  select,input{
+    width:100%;
+    padding:10px;
+    border:2px solid #d1d5db;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:bold;
+    outline:none;
+  }
+
+  input[type="time"]{font-weight:normal;}
+
+  /* Toggle Résultat */
+  .toggle-result{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:10px;
+    margin-bottom:10px;
+  }
+
+  .result{
+    background:#0077b6;
+    color:white;
+    text-align:center;
+    padding:12px;
+    border-radius:10px;
+    font-size:18px;
+    font-weight:bold;
+    display:none;
+  }
+
+  .btn{
+    width:100%;
+    background:#22c55e;
+    border:none;
+    padding:14px;
+    border-radius:12px;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+    color:white;
+    margin-top:15px;
+  }
+
+  .btn:hover{background:#16a34a;}
+
+  .history-btn{
+    margin-top:10px;
+    width:100%;
+    background:#0ea5e9;
+    color:white;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    font-weight:bold;
+    cursor:pointer;
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-app">
+  <img id="appLogo" src="" alt="Logo">
+</div>
+
+    <div class="user-info">
+      <span>Admin</span>
+      <div class="user-avatar">A</div>
+    </div>
+  </div>
+
+  <!-- Sélection -->
+  <div class="row">
+    <select id="date">
+      <option disabled selected>Date</option>
+    </select>
+
+    <select id="ferme">
+      <option disabled selected>Ferme</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <select id="secteur">
+      <option disabled selected>Secteur</option>
+    </select>
+
+    <select id="serre">
+      <option disabled selected>Serre</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <select id="point">
+      <option disabled selected>Point</option>
+    </select>
+    <div style="flex:1"></div>
+  </div>
+
+  <!-- Poids -->
+  <div class="row">
+    <input type="number" id="poidsAvant" placeholder="Poids avant (kg)">
+    <input type="time" id="heureAvant">
+  </div>
+
+  <div class="row">
+    <input type="number" id="poidsApres" placeholder="Poids après (kg)">
+    <input type="time" id="heureApres">
+  </div>
+
+  <!-- Toggle Résultat -->
+  <div class="toggle-result">
+    <input type="checkbox" id="switchRes" onclick="toggleResult()">
+    <label for="switchRes">Afficher le Résultat</label>
+  </div>
+
+  <!-- Résultat -->
+  <div class="result" id="result"></div>
+
+  <button class="btn" onclick="valid()">Validé</button>
+
+  <button class="history-btn">
+    📊 Consulter les enregistrements
+  </button>
+
+</div>
+
+<script>
+function valid(){
+  let avant = parseFloat(document.getElementById("poidsAvant").value) || 0;
+  let apres = parseFloat(document.getElementById("poidsApres").value) || 0;
+
+  if(avant <= 0 || apres <= 0){
+    document.getElementById("result").textContent = "⚠️ Vérifier les valeurs";
+    return;
+  }
+
+  let res = ((avant - apres) / avant) * 100;
+  document.getElementById("result").textContent =
+    "Résultat : " + res.toFixed(2) + " %";
+}
+
+function toggleResult(){
+  let box = document.getElementById("result");
+  if(document.getElementById("switchRes").checked){
+    box.style.display = "block";
+    valid();
+  }else{
+    box.style.display = "none";
+  }
+}
+window.addEventListener("load", function(){
+    const savedLogo = localStorage.getItem("app_logo");
+    if(savedLogo){
+        const logo = document.getElementById("appLogo");
+        if(logo) logo.src = savedLogo;
+    }
+});
+</script>
+
+
+</body>
+</html>

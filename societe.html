@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sociétés</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#eaeaea;
+  padding:20px;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+  background:white;
+  padding:16px;
+  border-radius:16px;
+  box-shadow:0 4px 20px rgba(0,0,0,.1);
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.header h2{
+  color:#004a62;
+  font-size:18px;
+}
+
+.add-btn{
+  background:#22c55e;
+  color:white;
+  border:none;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  font-size:22px;
+  cursor:pointer;
+  flex-shrink:0;
+}
+
+.table-wrapper{
+  width:100%;
+  overflow-x:auto;
+  border-radius:12px;
+}
+
+.table-wrapper::-webkit-scrollbar{
+  height:6px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb{
+  background:#cbd5e1;
+  border-radius:10px;
+}
+
+table{
+  width:100%;
+  min-width:700px;
+  border-collapse:separate;
+  border-spacing:0;
+  border-radius:12px;
+  overflow:hidden;
+  background:white;
+}
+
+thead{
+  background:#008ecc;
+  color:white;
+}
+
+thead th:first-child{
+  border-top-left-radius:12px;
+}
+
+thead th:last-child{
+  border-top-right-radius:12px;
+}
+
+th,td{
+  padding:10px 12px;
+  border-bottom:1px solid #ddd;
+  text-align:center;
+  white-space:nowrap;
+  font-size:14px;
+}
+
+tbody tr:nth-child(even){
+  background:#f9f9f9;
+}
+
+.action-btn{
+  color:#ef4444;
+  cursor:pointer;
+  font-size:18px;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+
+.modal-content{
+  background:white;
+  padding:20px;
+  width:100%;
+  max-width:420px;
+  border-radius:12px;
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.modal-header h3{
+  color:#004a62;
+}
+
+.modal-content input{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.btn-save{
+  background:#22c55e;
+  border:none;
+  color:white;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  flex:1;
+}
+
+.btn-cancel{
+  background:#ef4444;
+  border:none;
+  color:white;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  flex:1;
+}
+
+@media (max-width: 600px){
+  body{
+    padding:14px;
+  }
+
+  .container{
+    padding:14px;
+    border-radius:14px;
+  }
+
+  .header h2{
+    font-size:17px;
+  }
+
+  .add-btn{
+    width:36px;
+    height:36px;
+    font-size:20px;
+  }
+
+  th,td{
+    padding:9px 10px;
+    font-size:13px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h2>Sociétés</h2>
+    <button class="add-btn" onclick="openModal()">+</button>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Ville</th>
+          <th>Adresse</th>
+          <th>Téléphone</th>
+          <th>Email</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="societeTable"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Ajouter société</h3>
+      <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer"></i>
+    </div>
+
+    <input id="nom" placeholder="Nom société">
+    <input id="ville" placeholder="Ville">
+    <input id="adresse" placeholder="Adresse">
+    <input id="tel" placeholder="Téléphone">
+    <input id="email" placeholder="Email">
+
+    <div class="modal-actions">
+      <button class="btn-save" onclick="saveSociete()">✓</button>
+      <button class="btn-cancel" onclick="closeModal()">✕</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let societes = JSON.parse(localStorage.getItem("societes")) || [];
+
+function render(){
+  const tbody = document.getElementById("societeTable");
+  tbody.innerHTML = "";
+
+  societes.forEach((s,i)=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${s.nom || "-"}</td>
+      <td>${s.ville || "-"}</td>
+      <td>${s.adresse || "-"}</td>
+      <td>${s.tel || "-"}</td>
+      <td>${s.email || "-"}</td>
+      <td>
+        <i class="fas fa-trash action-btn" onclick="deleteSociete(${i})"></i>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function openModal(){
+  document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display = "none";
+  nom.value = "";
+  ville.value = "";
+  adresse.value = "";
+  tel.value = "";
+  email.value = "";
+}
+
+function saveSociete(){
+  if(!nom.value.trim()) return alert("Nom obligatoire");
+
+  societes.push({
+    nom: nom.value,
+    ville: ville.value,
+    adresse: adresse.value,
+    tel: tel.value || "",
+    email: email.value || ""
+  });
+
+  localStorage.setItem("societes", JSON.stringify(societes));
+  closeModal();
+  render();
+}
+
+function deleteSociete(i){
+  if(confirm("Supprimer cette société ?")){
+    societes.splice(i,1);
+    localStorage.setItem("societes", JSON.stringify(societes));
+    render();
+  }
+}
+
+render();
+</script>
+
+</body>
+</html>

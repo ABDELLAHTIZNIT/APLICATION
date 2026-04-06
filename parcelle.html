@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parcelles</title>
+
+<!-- CSS الموحد -->
+<link rel="stylesheet" href="theme.css">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h2>Parcelles</h2>
+    <button class="btn btn-primary" onclick="openModal()">+</button>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Secteur</th>
+          <th>Parcelle Physique</th>
+          <th>Produit</th>
+          <th>Surface</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="parcelleTable"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Ajouter une parcelle</h3>
+      <i class="fas fa-times" onclick="closeModal()"></i>
+    </div>
+
+    <input type="text" id="parcelleNom" placeholder="Nom parcelle">
+
+    <select id="parcelleSecteur">
+      <option value="">-- Choisir secteur --</option>
+    </select>
+
+    <select id="parcellePhysique">
+      <option value="">-- Choisir parcelle physique --</option>
+    </select>
+
+    <input type="text" id="parcelleProduit" placeholder="Produit (ex: Tomate)">
+    <input type="number" id="parcelleSurface" placeholder="Surface (ha ou m²)">
+
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveParcelle()">✓</button>
+      <button class="btn btn-danger" onclick="closeModal()">✕</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let parcelles = JSON.parse(localStorage.getItem("parcelles")) || [];
+let secteurs = JSON.parse(localStorage.getItem("secteurs")) || [];
+let parcellesPhysiques = JSON.parse(localStorage.getItem("parcelles_physiques")) || [];
+
+function loadSelects(){
+  const sSelect = document.getElementById("parcelleSecteur");
+  const pSelect = document.getElementById("parcellePhysique");
+
+  sSelect.innerHTML = '<option value="">-- Choisir secteur --</option>';
+  pSelect.innerHTML = '<option value="">-- Choisir parcelle physique --</option>';
+
+  secteurs.forEach(s=>{
+    const o = document.createElement("option");
+    o.value = s.nom;
+    o.textContent = s.nom;
+    sSelect.appendChild(o);
+  });
+
+  parcellesPhysiques.forEach(p=>{
+    const o = document.createElement("option");
+    o.value = p.nom;
+    o.textContent = p.nom;
+    pSelect.appendChild(o);
+  });
+}
+
+function renderParcelles(){
+  const tbody = document.getElementById("parcelleTable");
+  tbody.innerHTML = "";
+
+  parcelles.forEach((p,i)=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${p.nom}</td>
+      <td>${p.secteur}</td>
+      <td>${p.parcelle_physique}</td>
+      <td>${p.produit || "-"}</td>
+      <td>${p.surface || "-"}</td>
+      <td>
+        <i class="fas fa-trash action-btn action-delete" onclick="deleteParcelle(${i})"></i>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function openModal(){
+  loadSelects();
+  document.getElementById("modal").style.display="flex";
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+  parcelleNom.value="";
+  parcelleSecteur.value="";
+  parcellePhysique.value="";
+  parcelleProduit.value="";
+  parcelleSurface.value="";
+}
+
+function saveParcelle(){
+  if(!parcelleNom.value || !parcelleSecteur.value || !parcellePhysique.value){
+    alert("Nom, secteur et parcelle physique obligatoires");
+    return;
+  }
+
+  parcelles.push({
+    nom: parcelleNom.value,
+    secteur: parcelleSecteur.value,
+    parcelle_physique: parcellePhysique.value,
+    produit: parcelleProduit.value,
+    surface: parcelleSurface.value
+  });
+
+  localStorage.setItem("parcelles", JSON.stringify(parcelles));
+  closeModal();
+  renderParcelles();
+}
+
+function deleteParcelle(i){
+  if(confirm("Supprimer cette parcelle ?")){
+    parcelles.splice(i,1);
+    localStorage.setItem("parcelles", JSON.stringify(parcelles));
+    renderParcelles();
+  }
+}
+
+renderParcelles();
+</script>
+
+</body>
+</html>

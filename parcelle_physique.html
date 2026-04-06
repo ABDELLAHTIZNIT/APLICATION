@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parcelles physiques</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+
+body{
+  background:#f3f4f6;
+  padding:20px;
+  display:flex;
+  justify-content:center;
+}
+
+.container{
+  width:100%;
+  max-width:900px;
+  background:#fff;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.header h2{color:#065f46}
+
+.add-btn{
+  background:#22c55e;
+  border:none;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #e5e7eb;
+  text-align:center;
+}
+
+th{
+  background:#ecfdf5;
+  color:#065f46;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-content{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  width:100%;
+  max-width:420px;
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.modal-header i{cursor:pointer}
+
+input,select{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #d1d5db;
+}
+
+.actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+
+.save{background:#22c55e;border:none;padding:8px 14px;font-size:18px}
+.cancel{background:#ef4444;border:none;padding:8px 14px;font-size:18px}
+.delete{color:#ef4444;cursor:pointer}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h2>Parcelles physiques</h2>
+    <button class="add-btn" onclick="openModal()">+</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Ferme</th>
+        <th>Superficie (ha)</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Ajouter parcelle physique</h3>
+      <i class="fas fa-times" onclick="closeModal()"></i>
+    </div>
+
+    <input id="nom" placeholder="Nom (ex: P1)">
+    <select id="ferme">
+      <option value="">-- Choisir Ferme --</option>
+      <option>Ferme A</option>
+      <option>Ferme B</option>
+    </select>
+    <input id="superficie" type="number" placeholder="Superficie (ha)">
+
+    <div class="actions">
+      <button class="save" onclick="save()">✓</button>
+      <button class="cancel" onclick="closeModal()">×</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("parcelles_physiques")) || [];
+
+function openModal(){ modal.style.display="flex"; }
+function closeModal(){ modal.style.display="none"; }
+
+function save(){
+  data.push({
+    nom: nom.value,
+    ferme: ferme.value,
+    superficie: superficie.value
+  });
+  localStorage.setItem("parcelles_physiques", JSON.stringify(data));
+  closeModal();
+  render();
+}
+
+function render(){
+  tableBody.innerHTML="";
+  data.forEach((p,i)=>{
+    tableBody.innerHTML += `
+      <tr>
+        <td>${p.nom}</td>
+        <td>${p.ferme}</td>
+        <td>${p.superficie}</td>
+        <td><i class="fas fa-trash delete" onclick="remove(${i})"></i></td>
+      </tr>`;
+  });
+}
+
+function remove(i){
+  data.splice(i,1);
+  localStorage.setItem("parcelles_physiques", JSON.stringify(data));
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
