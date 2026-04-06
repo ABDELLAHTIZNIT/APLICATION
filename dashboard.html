@@ -1,197 +1,224 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
 
-<!-- FontAwesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<style>
-  *{box-sizing:border-box;margin:0;padding:0;}
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
 
-  body{
-    background:#0b1120;
-    font-family:Arial, sans-serif;
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    padding:20px;
-    color:white;
-  }
+    body{
+      background:#0b1120;
+      font-family:Arial, sans-serif;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:20px;
+      color:white;
+    }
 
-  .dashboard{
-    width:100%;
-    max-width:520px;
-  }
+    .dashboard{
+      width:100%;
+      max-width:520px;
+    }
 
-  /* HEADER */
-  .header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-  }
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
 
-  .logo-app{
-  width:90px;
-  background:transparent;
-}
+    .logo-app{
+      width:90px;
+      background:transparent;
+    }
 
-.logo-app img{
-  width:100%;
-  height:auto;
-  object-fit:contain;
-}
+    .logo-app img{
+      width:100%;
+      height:auto;
+      object-fit:contain;
+      display:block;
+    }
 
+    .user-info{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:15px;
+      font-weight:bold;
+    }
 
-  .user-info{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size:15px;
-    font-weight:bold;
-  }
+    .user-avatar{
+      width:30px;
+      height:30px;
+      background:#22c55e;
+      border-radius:50%;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      color:#022c22;
+      font-size:12px;
+      font-weight:bold;
+    }
 
-  .user-avatar{
-    width:30px;
-    height:30px;
-    background:#22c55e;
-    border-radius:50%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    color:#022c22;
-    font-size:12px;
-    font-weight:bold;
-  }
+    .title{
+      font-size:21px;
+      font-weight:bold;
+      margin-bottom:20px;
+      text-align:center;
+    }
 
-  .title{
-    font-size:21px;
-    font-weight:bold;
-    margin-bottom:20px;
-    text-align:center;
-  }
+    .item{
+      background:#111827;
+      padding:14px 20px;
+      border-radius:12px;
+      margin-bottom:12px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      border:1px solid #1e293b;
+      cursor:pointer;
+      transition:.2s;
+    }
 
-  /* ITEMS */
-  .item{
-    background:#111827;
-    padding:14px 20px;
-    border-radius:12px;
-    margin-bottom:12px;
-    display:flex;
-    align-items:center;
-    gap:14px;
-    border:1px solid #1e293b;
-    cursor:pointer;
-    transition:.2s;
-  }
+    .item:hover{
+      border-color:#22c55e;
+      transform:translateX(4px);
+    }
 
-  .item:hover{
-    border-color:#22c55e;
-    transform:translateX(4px);
-  }
+    .item i{
+      font-size:20px;
+      background:#1e293b;
+      padding:10px;
+      border-radius:10px;
+    }
 
-  .item i{
-    font-size:20px;
-    background:#1e293b;
-    padding:10px;
-    border-radius:10px;
-  }
+    .txt{
+      font-size:16px;
+      font-weight:600;
+    }
 
-  .txt{
-    font-size:16px;
-    font-weight:600;
-  }
+    .icon-settings{color:#22c55e;}
+    .icon-irrigation{color:#4ade80;}
+    .icon-water{color:#38bdf8;}
+    .icon-engrais{color:#facc15;}
+    .icon-meteo{color:#60a5fa;}
+    .icon-balance{color:#a855f7;}
 
-  /* Colors */
-  .icon-settings{color:#22c55e;}
-  .icon-irrigation{color:#4ade80;}
-  .icon-water{color:#38bdf8;}
-  .icon-engrais{color:#facc15;}
-  .icon-meteo{color:#60a5fa;}
-  .icon-balance{color:#a855f7;} /* بنفسجي جميل */
-</style>
+    .logout-btn{
+      margin-top:18px;
+      width:100%;
+      border:none;
+      border-radius:12px;
+      padding:12px;
+      background:#ef4444;
+      color:white;
+      font-size:15px;
+      font-weight:bold;
+      cursor:pointer;
+      transition:.2s;
+    }
+
+    .logout-btn:hover{
+      background:#dc2626;
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="dashboard">
+  <div class="dashboard">
 
-  <!-- HEADER -->
-  <div class="header">
-    <!-- هنا غادي ندير PNG من بعد -->
-    <div class="logo-app">
-  <img id="appLogo" src="" alt="Logo">
-</div>
+    <div class="header">
+      <div class="logo-app">
+        <img id="appLogo" src="" alt="Logo">
+      </div>
 
-
-    <div class="user-info">
-      <span>Admin</span>
-      <div class="user-avatar">A</div>
+      <div class="user-info">
+        <span id="displayUser">Admin</span>
+        <div class="user-avatar" id="userAvatar">A</div>
+      </div>
     </div>
+
+    <div class="title">Dashboard</div>
+
+    <div class="item" onclick="openPage('parametres')">
+      <i class="fas fa-gear icon-settings"></i>
+      <span class="txt">Paramètres</span>
+    </div>
+
+    <div class="item" onclick="openPage('irrigation')">
+      <i class="fas fa-seedling icon-irrigation"></i>
+      <span class="txt">Suivi irrigation</span>
+    </div>
+
+    <div class="item" onclick="openPage('eau')">
+      <i class="fas fa-droplet icon-water"></i>
+      <span class="txt">Suivi eau</span>
+    </div>
+
+    <div class="item" onclick="openPage('engrais')">
+      <i class="fas fa-leaf icon-engrais"></i>
+      <span class="txt">Engrais</span>
+    </div>
+
+    <div class="item" onclick="openPage('climat')">
+      <i class="fas fa-cloud-sun-rain icon-meteo"></i>
+      <span class="txt">Climat & Capteurs</span>
+    </div>
+
+    <div class="item" onclick="openPage('balance')">
+      <i class="fas fa-scale-balanced icon-balance"></i>
+      <span class="txt">Balance</span>
+    </div>
+
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-right-from-bracket"></i> Déconnexion
+    </button>
+
   </div>
 
-  <div class="title">Dashboard</div>
+  <script>
+    window.addEventListener("load", function(){
+      const savedLogo = localStorage.getItem("app_logo");
+      const loggedUser = localStorage.getItem("logged_user");
 
-  <!-- عناصر القائمة -->
-  <div class="item" onclick="openPage('parametres')">
-    <i class="fas fa-gear icon-settings"></i>
-    <span class="txt">Paramètres</span>
-  </div>
+      const logo = document.getElementById("appLogo");
+      const displayUser = document.getElementById("displayUser");
+      const userAvatar = document.getElementById("userAvatar");
 
-  <div class="item" onclick="openPage('irrigation')">
-    <i class="fas fa-seedling icon-irrigation"></i>
-    <span class="txt">Suivi irrigation</span>
-  </div>
+      if(savedLogo && logo){
+        logo.src = savedLogo;
+      }
 
-  <div class="item" onclick="openPage('eau')">
-    <i class="fas fa-droplet icon-water"></i>
-    <span class="txt">Suivi eau</span>
-  </div>
+      if(loggedUser){
+        displayUser.textContent = loggedUser;
+        userAvatar.textContent = loggedUser.charAt(0).toUpperCase();
+      }
+    });
 
-  <div class="item" onclick="openPage('engrais')">
-    <i class="fas fa-leaf icon-engrais"></i>
-    <span class="txt">Engrais</span>
-  </div>
-
-  <div class="item" onclick="openPage('climat')">
-    <i class="fas fa-cloud-sun-rain icon-meteo"></i>
-    <span class="txt">Climat & Capteurs</span>
-  </div>
-
-  <!-- Balance -->
-  <div class="item" onclick="openPage('balance')">
-    <i class="fas fa-scale-balanced icon-balance"></i>
-    <span class="txt">Balance</span>
-  </div>
-
-</div>
-
-<script>
-/* تحميل الشعار عند فتح الصفحة */
-window.addEventListener("load", function(){
-    const savedLogo = localStorage.getItem("app_logo");
-    if(savedLogo){
-        const logo = document.getElementById("appLogo");
-        if(logo) logo.src = savedLogo;
+    function openPage(section){
+      if(section === "parametres") location.href = "parametres.html";
+      else if(section === "irrigation") location.href = "irrigation.html";
+      else if(section === "eau") location.href = "eau.html";
+      else if(section === "engrais") location.href = "engrais.html";
+      else if(section === "climat") location.href = "climat.html";
+      else if(section === "balance") location.href = "balance.html";
     }
-});
 
-/* التنقل بين الصفحات */
-function openPage(section){
-    if(section === "parametres") location.href = "parametres.html";
-    if(section === "irrigation") location.href = "irrigation.html";
-    if(section === "eau")        location.href = "eau.html";
-    if(section === "engrais")    location.href = "engrais.html";
-    if(section === "climat")     location.href = "climat.html";
-    if(section === "balance")    location.href = "balance.html";
-}
-</script>
-
-
+    function logout(){
+      localStorage.removeItem("logged_user");
+      location.href = "index.html";
+    }
+  </script>
 
 </body>
 </html>
